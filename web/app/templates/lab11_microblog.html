@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="static/css/open-iconic-bootstrap.css">
+  <link rel="stylesheet" href="static/css/mytwitter.css">
+  <link rel="stylesheet" href="static/css/phonebook.css">
+
+  <title>My Twitter</title>
+</head>
+
+<body style="background-color: #e7ecf0;">
+  <nav class="navbar navbar-expand-md navbar-light">
+    <div class="container" style="padding:0px;background-color: #FFFFFF;">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="#"><span class="oi oi-home"></span> Home</a>
+        <a class="nav-item nav-link" href="#"><span class="oi oi-bolt"></span> Moments</a>
+        <a class="nav-item nav-link" href="#"><span class="oi oi-bell"></span> Notifications</a>
+        <a class="nav-item nav-link" href="#"><span class="oi oi-envelope-open"></span> Messages</a>
+      </div>
+      <form class="form-inline">
+        <input class="form-control" id="nav-search" type="search" placeholder="Search Twitter" > &nbsp;
+        {% if current_user.is_authenticated %}
+        <img class="tw-user-small rounded-circle" src="{{ current_user.avatar_url }}" style="margin-left: 0px;"> &nbsp;
+        <button onclick="location.href='{{ url_for('lab12_confrim') }}'" type="button" class="btn" id="nav-tweet-btn" style="border-radius: 20px 0px 0px 20px;">Edit Profile</button>
+        <button onclick="location.href='{{ url_for('lab12_logout') }}'" type="button" class="btn" id="nav-tweet-btn" style="border-radius: 0px 20px 20px 0px;">Logout</button>
+        {% else %}
+        <img class="tw-user-small rounded-circle" src="static/img/login_1.png"> &nbsp;
+        <button onclick="location.href='{{ url_for('lab12_login') }}'" type="button" class="btn" id="nav-tweet-btn">Login</button>
+        {% endif %}
+        
+      </form>
+    </div>
+  </nav>
+  <div id="add-edit" class="container" hidden="hidden" style="width: 65% ;padding: 3% 10% 3% 10%;">
+    <h1 id="add-edit-caption" class="addoredit" >aaaaa</h1>
+    <h5 id="demo"></h5>
+    <form id="addPhoneNumberForm">
+      <label for="name"><h5> Name</h5></label>
+      <input type="text" id="name" name="name" placeholder="Your name.." required readonly style="background-color: #ccc;">
+      <label for="emaile"><h5>Email</h5></label>
+      <input type="email" id="email" name="email" class="row " placeholder="Your email.." required style="width: 100% ;margin:0;
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      resize: vertical;
+      background-color: #ccc;"
+      " readonly>
+      <label for="message"><h5>Message</h5></label>
+      <textarea rows="4" cols="50" id="message" name="message" placeholder=" message.." required></textarea>
+      <input type="hidden" id="entryid" name="id" value="">
+      <div class="d-flex flex-row-reverse">
+        <input id="id_sub" type="submit" name="submit" value="Submit" style="background-color:#3177EA; border-radius: 10px;  margin-left: 1%;">
+        <button id="clear_form" type="button" style="background-color:#3177EA; border-radius: 10px; margin-left: 1%;">Clear</button>
+        <button id="cancel_form" type="button" style="background-color:#3177EA; border-radius: 10px;">Cancel</button>
+      </div>
+      </div>
+    </form>
+  </div>
+  &nbsp;
+  <div id="contact_display" class="container">
+    <div class="container">
+      <div class="row">
+        <div id="left_3" class="col-md-3">
+          <div class="content-box">Account details</div>
+          <div class="content-box">Trends</div>
+        </div>
+        <div id="center_6" class="col-md-6">
+          <div class="content-box">
+            <div class="new-tweet-row">
+              <div class="row">
+                <div class="col-md-2">
+                  {% if current_user.is_authenticated %}
+                  <img class="tw-user-small rounded-circle" src="{{ current_user.avatar_url }}" style="margin-left: 10px;"> &nbsp;
+                  {% else %}
+                  <img class="tw-user-small rounded-circle" src="static/img/login_1.png" style="margin-left: 10px;"> &nbsp;
+                  {% endif %}
+                </div>
+                <div class="col-md-9 p-r">
+                  {% if current_user.is_authenticated %}
+                  <button class="color-border " id="add_contact" type="button"style="background-color:#3177EA; color: #FFFFFF;border-radius: 10px;">Create Post</button>
+                  {% else %}
+                  <button onclick="location.href='{{ url_for('lab12_login') }}' " type="button" class="color-border " style="background-color:#3177EA; color: #FFFFFF;border-radius: 10px;">
+                    Create Post</button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div id="dataContainer"></div>
+          </div>
+        </div>
+        <div id="right_3" class="col-md-2">
+          <div class="content-box">Who to follow</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+  <!-- Bootstrap Table -->
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.css">
+  <script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>
+</body>
+
+</html>
+
+<script>
+  let tests = null;
+  let mes_email = null;
+
+  function populate_table(blog_entries) {
+    $('#phonebook-table').bootstrapTable({
+      data: blog_entries,
+      sortName: 'id',
+      sortOrder: 'desc',
+    });
+  }
+  let test_check = null;
+  let test_check_1 = null;
+  let Authuer_data = null; // lab12/authuser/AuthUser  display show total User ( email password name )
+
+  let Avatar = null;
+  let check_ID = []; // current_user_by id
+
+  function refresh_Authuser(){
+    $.ajax({
+      url: "lab12/authuser/AuthUser", // total ID
+      type: "GET",
+      success: function (Authuser) {
+        Authuser.sort(function (a, b) {
+          return a.id - b.id;
+        });
+        Authuer_data = Authuser
+      }
+    });
+  }
+
+  function datatest(data) {
+    let database = data;
+    tests = database;
+    refresh_Authuser();
+    const dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = ""; // clear the previous data
+    database.sort(function (a, b) {
+      return b.id - a.id;
+    });
+    mes_email =database[0];
+    tests.forEach(function (value, i) {
+      let recordDiv = document.createElement("div");
+      if (database[i].date_updated == null) {
+        date_time = " - TIME:  "+database[i].date_created ;
+      } else {
+        date_time =" - Edit: "+database[i].date_updated;
+      }
+      test_check = database[i].ID_User ; 
+      
+
+      //email name change accordingly
+      number = database[i].owner_id
+      number = parseInt(number);
+      number = number-1;
+      var test = JSON.stringify(database[i]);
+      if (database[i].owner_id == "{{ current_user.id }}") {
+      recordDiv.innerHTML =`
+        <div class="tweet">
+        <div class="row">
+          <div class="col-md-2 text-center">
+            <img src="`+ Authuer_data[number].avatar_url +`" class="tw-user-small rounded-circle">
+          </div>
+          <div class="col-md-10">
+            <div class="row tweet-info">
+              <div class="col-md-auto">
+                <span class="tweet-username">` +       Authuer_data[number].name  +`</span>
+                <span class="tweet-usertag text-muted">` +      Authuer_data[number].email +`</span>
+              </div>
+              <div class="col tweet-arrow text-muted">
+                <div class="d-flex flex-row-reverse" id="demo">
+                  <a class="remove" href="javascript:void(0)" onclick="removeItem(tests[`+i+`])" style="margin-right: 1%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                    </svg>
+                  </a>
+                  <a href="javascript:void(0)" onclick="prePopulateForm(tests[`+i+`])" style="margin-right: 1%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="tweet-text">
+              <span class="tweet-age text-muted"> ID : ` +  database[i].id +`</span>
+              <span class="tweet-age text-muted">` +  date_time +`</span>
+              <br>
+              <br>
+            </div>
+            <div class="tweet-media" style="background-color:#e7ecf0;border-radius: 10px;margin-right: 20px;padding: 10px;">
+              <div class="tweet-text text-break">` +  database[i].message +`</div>
+              
+            </div>
+            <div class="tweet-media">
+              <br>
+            </div>
+            <div class="row text-muted">
+                  <div class="col-md-2"><span class="oi oi-bullhorn"></span></div>
+                  <div class="col-md-2"><span class="oi oi-loop-circular"></span></div>
+                  <div class="col-md-2"><span class="oi oi-heart"></span></div>
+                  <div class="col-md-2"><span class="oi oi-envelope-open"></span></div>
+                </div>
+          </div>
+        </div>
+      </div>`
+      dataContainer.appendChild(recordDiv);
+      }
+      else {
+        recordDiv.innerHTML =`
+        <div class="tweet">
+        <div class="row">
+          <div class="col-md-2 text-center">
+            <img src=" ${Authuer_data[number].avatar_url}  " class="tw-user-small rounded-circle">
+          </div>
+          <div class="col-md-10">
+            <div class="row tweet-info">
+              <div class="col-md-auto">
+                <span class="tweet-username">` +       Authuer_data[number].name  +`</span>
+                <span class="tweet-usertag text-muted">` +      Authuer_data[number].email +`</span>
+              </div>
+            </div>
+            <div class="tweet-text">
+              <span class="tweet-age text-muted"> ID : ` +  database[i].id +`</span>
+              <span class="tweet-age text-muted">` +  date_time +`</span>
+              <br>
+              <br>
+            </div>
+            <div class="tweet-media" style="background-color:#e7ecf0;border-radius: 10px;margin-right: 20px;padding: 10px;">
+              <div class="tweet-text text-break">` +  database[i].message +`</div>
+              
+            </div>
+            <div class="tweet-media">
+              <br>
+            </div>
+            <div class="row text-muted">
+                  <div class="col-md-2"><span class="oi oi-bullhorn"></span></div>
+                  <div class="col-md-2"><span class="oi oi-loop-circular"></span></div>
+                  <div class="col-md-2"><span class="oi oi-heart"></span></div>
+                  <div class="col-md-2"><span class="oi oi-envelope-open"></span></div>
+                </div>
+          </div>
+        </div>
+      </div>`
+      dataContainer.appendChild(recordDiv);
+      }
+    });
+  }
+  function refreshData() {
+    $.ajax({
+      url: "lab12/authuser/PrivateBlogEntry", // All post total owner_ID
+      type: "GET",
+      success: function (data) {
+        datatest(data);
+      }
+    });
+  }
+  function check_delete(){
+    $.ajax({
+      url: "lab11/BlogEntry",// current_user_by id
+      type: "GET",
+      success: function (data) {
+        data_check(data);
+      }
+    });
+  }
+
+  function data_check(data) {
+    check_ID = data
+  }
+  $(document).ready(function () {
+    (function () {
+      $.getJSON("lab11/BlogEntry/all", populate_table);
+      
+      check_delete()
+      refresh_Authuser();
+      refreshData()
+      refreshData()
+      // test code time 
+
+
+      setInterval(refreshData,600);
+    })();
+  });
+  // refresh the table after a read update
+  function refresh_table(blog_entries) {
+    $('#phonebook-table').bootstrapTable('load', blog_entries);
+  }
+
+  $("#addPhoneNumberForm").submit(function (event) {
+    event.preventDefault();
+
+    // pack the inputs into a dictionary
+    var formData = {};
+    $(":input").each(function () {
+      var key = $(this).attr('name');
+      var val = $(this).val();
+
+      if (key != 'submit') {
+        formData[key] = val;
+      }
+
+    });
+    const now = new Date();
+    let timeString = now.toLocaleTimeString('th-TH', { hour24: true, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    let day = now.getDate().toString().padStart(2, '0');
+    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+    let year = now.getFullYear().toString();
+    let dateString = `${day}/${month}/${year}`;
+    var $form = $(this);
+    var url = $form.attr("action");
+
+    formData['date_created'] = dateString +"   "+ timeString;
+    // make a POST call to the back end w/ a callback to refresh the table
+    $.post(url, formData, function (blog_entries) {
+      
+      clearForm();
+      toggleView();
+      refreshData()
+    });
+  });
+
+  function clearForm() {
+    $('#addPhoneNumberForm')[0].reset();
+    $('#name').val("{{ current_user.name }}");
+    $('#email').val("{{ current_user.email }}");
+    $('#entryid').val('');
+  }
+
+  function actionFormatter(value, row, index) {
+    return [
+      '<a class="edit" href="javascript:void(0)" title="Like">',
+      '✏️',
+      '</a>  ',
+      '<a class="remove" href="javascript:void(0)" title="Remove">',
+      '🗑️',
+      '</a>'
+    ].join('')
+  }
+
+  window.operateEvents = {
+    'click .edit': function (e, value, row, index) {
+      prePopulateForm(row);
+    },
+    'click .remove': function (e, value, row, index) {
+      removeItem(row);
+    }
+  }
+
+  function prePopulateForm(row) {
+    document.getElementById("add-edit-caption").innerHTML = "Edit Post";
+    toggleView();
+    $('#addPhoneNumberForm')[0].reset();
+    $('#name').val("{{ current_user.name }}");
+    $('#email').val("{{ current_user.email }}");
+    $('#message').val(row.message);
+    $('#entryid').val(row.id);
+
+  // Add a submit button to the form that updates the existing record
+   $("#submitButton").text("Update");
+   $("#submitButton").off("click");
+  $("#submitButton").click(function() {
+    // Update the existing record in the database
+    const updatedData = {
+      name: $("#name").val(),
+      message: $("#message").val(),
+      email: $("#email").val(),
+      id: $("#entryid").val(),
+      date_updated: new Date().toISOString()
+    };
+    updateData(updatedData);
+    toggleView();
+    refreshData()
+  });
+}
+
+  function removeItem(row) {
+    if (!confirm("Delete " + row.name + ' ' + row.email + '?')) {
+      refreshData()
+      return false;
+    }
+    var url = "lab11/remove_BlogEntry"
+    var formData = { 'id': row.id };
+    $.post(url, formData, function (blog_entries) {
+      refreshData()
+    });
+  }
+  function time() {
+    const now = new Date();
+      let timeString = now.toLocaleTimeString('th-TH', { hour24: true, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+      let day = now.getDate().toString().padStart(2, '0');
+      let month = (now.getMonth() + 1).toString().padStart(2, '0');
+      let year = now.getFullYear().toString();
+      let dateString = `${day}/${month}/${year}`;
+      let nowdate = ("Date : "+dateString +"   "+ timeString);
+      document.getElementById("demo").innerHTML = nowdate;
+  }
+  function toggleView() {
+    if ($('#contact_display').attr('hidden')) {
+      time();
+      $('#contact_display').removeAttr('hidden');
+      $('#add-edit').attr('hidden', 'hidden');
+      refreshData()
+    } else {
+      time();
+      $('#contact_display').attr('hidden', 'hidden');
+      $('#add-edit').removeAttr('hidden');
+      refreshData()
+    }
+  }
+
+
+  $("#add_contact").click(function () {
+    document.getElementById("add-edit-caption").innerHTML  = "Create Post";
+    console.log("POST");
+    clearForm();
+    $('#addPhoneNumberForm')[0].reset();
+    $('#name').val("{{ current_user.name }}");
+    $('#email').val("{{ current_user.email }}");
+    toggleView();
+    refreshData()
+  });
+
+  $("#clear_form").click(function () {
+    clearForm();
+  });
+
+
+  $("#cancel_form").click(function () {
+    clearForm();
+    toggleView();
+    refreshData()
+  });
+
+</script>

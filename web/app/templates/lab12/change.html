@@ -1,0 +1,42 @@
+{% extends "lab12/base.html" %}
+{% block content %}
+<div class="column is-4 is-offset-4">
+ <h3 class="title">Chenge data</h3>
+ <div class="box">
+   {% with messages = get_flashed_messages() %}
+   {% if messages %}
+   <div class="notification is-danger">
+     {{ messages[0] }}
+   </div>
+   {% endif %}
+   {% endwith %}
+   <form method="POST">
+     <div class="field">
+       <div class="control">
+        <span>Email</span>
+         <input class="input is-large" id="email" type="email" name="email" placeholder="Your Email" autofocus="">
+       </div>
+     </div>
+     <div class="field">
+       <div class="control">
+        <span>Name</span>
+         <input class="input is-large" id="name" type="text" name="name" placeholder="Your name">
+       </div>
+     </div>
+     <button class="button is-block is-info is-large is-fullwidth" onclick="alert_">Confrim !</button>
+   </form>
+   <button onclick="location.href='{{ url_for('lab11') }}' " class="button is-block is-info is-large is-fullwidth" style="background-color: #a09ea1;margin-top: 10px;">Back Home </button>
+ </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script>
+  $(document).ready(function () {
+    (function () {
+      $('#name').val("{{current_user.name}}");
+      $('#email').val("{{current_user.email}}");
+    })();
+  });
+  function alert_() {
+  }
+</script>
+{% endblock %}
